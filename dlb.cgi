@@ -66,7 +66,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (style (~a ".floating-header { position: fixed; top: 0px; height: 5em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: #5B9AA0; }"))
    (style (~a ".main-content { margin-left: 1em; margin-right: 0.5em; }"))
    (style (~a ".footnote { margin-top: 5px; }"))
-   (style (~a ".gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: masonry; }"))))
+   (style (~a ".gallery { display: flex; flex-wrap: wrap; }"))))
 
 #| Floating Header |#
 (define floating-header
