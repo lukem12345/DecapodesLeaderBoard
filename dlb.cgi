@@ -19,8 +19,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (number->string (seconds->days
                    (- (current-seconds)
                       (apply find-seconds day)))))
-(define days-since-record (days-since (list 0 0 0 21 7 2023)))
-(define days-since-entry (days-since (list 0 0 0 17 5 2024)))
+(define days-since-record (days-since (list 0 0 0 24 4 2024)))
+(define days-since-entry (days-since (list 0 0 0 9 5 2024)))
 
 #| Record Data |#
 (struct record (day initials multiphysics link dev-time))
