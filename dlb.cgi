@@ -30,12 +30,13 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
                  (record "Apr 7, 2023" "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
                  (record "Feb 17, 2023" "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
                  (record "Sep 1, 2023" "LM & GR" "Burger's" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
-                 (record "July 13, 2023" "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
                  (record "July 12, 2023" "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
                  (record "July 11, 2023" "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
                  (record "Feb 16, 2023" "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
                  (record "May 17, 2024" "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
-                 (record "Feb  7, 2023" "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")))
+                 (record "July 13, 2023" "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
+                 (record "Feb  7, 2023" "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
+                 (record "May  9, 2024" "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
 
 #| Set up the page |#
 (define ox output-xml)
@@ -93,6 +94,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define pictures (list
                   (picture "Multispecies Navier-Stokes" "imgs/multispecies.gif" "A gif of a multispecies Navier-Stokes simulation")
                   (picture "Brusselator Reaction" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+                  (picture "Vorticity Navier-Stokes" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
                   (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
                   (picture "Teapot Brusselator Reaction" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
                   (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
