@@ -26,6 +26,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (struct record (day initials multiphysics link dev-time))
 (define records (list
                  (record "Mar 10, 2022" "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
+                 (record "April 24, 2024" "GR" "Cahn-Hilliard" "https://algebraicjulia.github.io/Decapodes.jl/dev/ch/cahn-hilliard/" "10 minutes")
                  (record "July 21, 2023" "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
                  (record "Apr 7, 2023" "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
                  (record "Feb 17, 2023" "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
@@ -95,8 +96,9 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
                   (picture "Multispecies Navier-Stokes" "imgs/multispecies.gif" "A gif of a multispecies Navier-Stokes simulation")
                   (picture "Brusselator Reaction" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
                   (picture "Vorticity Navier-Stokes" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
-                  (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+                  (picture "Cahn-Hilliard" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
                   (picture "Teapot Brusselator Reaction" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+                  (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
                   (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
                   (picture "Budyko-Sellers Climate Model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
                   (picture "Burger's Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
