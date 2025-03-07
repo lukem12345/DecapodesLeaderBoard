@@ -2,6 +2,8 @@
 
 #lang racket/base
 
+(define DEBUG #f)
+
 #|
 Author: Luke Lawlor Morris
 This CGI is meant to keep track of multiphysics simulations in a leader-board format.
@@ -12,6 +14,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (require syntax/to-string)
 (require racket/date)
 (require racket/format)
+(require racket/file)
+(require browser/external)
 
 #| Timer Helper Functions |#
 (define (seconds->days s) (floor (/ (/ (/ s 60) 60 ) 24)))
@@ -30,7 +34,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
                  (record "July 21, 2023" "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
                  (record "Apr 7, 2023" "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
                  (record "Feb 17, 2023" "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
-                 (record "Sep 1, 2023" "LM & GR" "Burger's" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
+                 (record "Sep 1, 2023" "LM & GR" "Burgers'" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
                  (record "July 12, 2023" "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
                  (record "July 11, 2023" "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
                  (record "Feb 16, 2023" "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
@@ -101,7 +105,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
                   (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
                   (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
                   (picture "Budyko-Sellers Climate Model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-                  (picture "Burger's Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
+                  (picture "Burgers' Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
 (define gallery
   (div class:"gallery"
        (map (λ (ge)
@@ -143,7 +147,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (h3 style: "float: left; padding-bottom:0em; margin-bottom:0em" "What is a Decapode?")
    (i style: "display: block; width: 150px; text-align: center; color: white; margin-bottom: 0.5em; text-shadow:2px 2px 1px orangered; margin-left: auto; margin-right:0;" align: "right" "The Diffusion Decapode")
    (img class:"picture-frame" style: "width: 150px;" align: "right" src: "imgs/diffusion.svg" alt: "A Decapode multiphysics diagram encoding diffusion")
-   (p "A " (strong "Decapode") " is a diagram of a system of multiphysics equations. That's all you need to know to start if you are a physicist looking to model fluid flow, or a chemist looking to model the reaction of some chemical species. However, people familiar with graph theory can understand these as something like directed acyclic graphs (" (strong "DAGs") "), where nodes are physical quantities, and edges are operators that relate them. People familiar with category theory will suspect that " (i "diagram") " carries a connotation with it of " (strong "composability") " of morphisms. That is, an arrow from A to B, and an arrow from B to C, can be understood as an arrow from A to C in its own right. People even more familiar with category can understand these as " (a href: "https://ncatlab.org/nlab/show/copresheaf" "copresheaves") " from some category acting like a database schema. Or, as people familiar with Catlab.jl will understand them, as a certain type of " (a href:"https://algebraicjulia.github.io/Catlab.jl/v0.12/apis/categorical_algebra/#Acsets" "Acset") ". But that's just what a Decapode is. What else is there to Decapodes?")
+   (p "A " (strong "Decapode") " is a diagram of a system of multiphysics equations. That's all you need to know to start if you are a physicist looking to model fluid flow, or a chemist looking to model the reaction of some chemical species. However, people familiar with graph theory can understand these as something like directed acyclic graphs (" (strong "DAGs") "), where nodes are physical quantities, and edges are operators that relate them. People familiar with category theory will suspect that " (i "diagram") " carries a connotation of " (strong "composability") " of morphisms. That is, an arrow from A to B, and an arrow from B to C, can be understood as an arrow from A to C in its own right. People even more familiar with category theory can understand these as " (a href: "https://ncatlab.org/nlab/show/copresheaf" "copresheaves") " from some category acting like a database schema. Or, as people familiar with Catlab.jl will understand them, as a certain type of " (a href:"https://algebraicjulia.github.io/Catlab.jl/v0.12/apis/categorical_algebra/#Acsets" "Acset") ".")
    (h3 "What makes constructing Decapodes fast?")
    (p "Constructing Decapodes is fast because you specify them exactly how you write your PDEs written in the Discrete Exterior Calculus.")
    (p "For example, we can write the equations for the Brusselator reaction like so:")
@@ -151,22 +155,17 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (p "Constructing complex multiphysics systems from simpler, component systems is fast because we use the technique of operadic composition. That is, we can describe complex multiphysics systems from which variables are shared between component systems.")
    (p "Rather than slowing us down, having formal descriptions of multiphysics diagrams enables us to develop models more quickly by providing all the information that you need to encode your multiphysics upfront.")
    (h3 "What makes Decapodes simulations fast?")
-   (p "Decapodes simulations are fast because their operators are implemented as matrix-matrix and matrix-vector multiplications. This is a property of the Discrete Exterior Calculus. Compounding on this, the auto-generated simulations consist of performant Julia code, and interface nicely with Julia packages like OrdinaryDiffEq.jl and MultiScaleArrays.jl.")
+   (p "Decapodes simulations are fast because their operators are implemented as matrix-vector multiplications or kernel operations. This is a property of the Discrete Exterior Calculus. Compounding on this, the auto-generated simulations consist of performant Julia code, and interface nicely with Julia packages like " (a href:"https://docs.sciml.ai/DiffEqDocs/stable/" "DifferentialEquations.jl") ".")
    (h3 "What makes Decapodes accurate?")
-   (p "Decapodes simulations are accurate because they use the Discrete Exterior Calculus (DEC). The DEC has the amazing property that the operators obey the same useful laws that they obey in the continuous case. One is that the exterior derivative, d, exhibits the property that dd = 0.")
+   (p "Decapodes simulations are accurate because they use the Discrete Exterior Calculus (DEC). In the DEC, discrete operators obey the same useful laws that they obey in the continuous case. One is that the exterior derivative, d, exhibits the property that dd = 0. This is sometimes called " (a href:"https://en.wikipedia.org/wiki/Mimesis_(mathematics)" "mimesis")".")
    (h3 "What makes Decapodes iterable?")
-   (p "Decapodes are iterable because new models can be written quickly. You do not have to worry about time spent in developing a simulator for your new model because Decapodes.jl will automatically generate the simulator for you! They allow a scientist to use the scientific method of creating a hypothesis model and then seek to validate (or rather disprove) it quickly.")
-   (p "Furthermore, a Decapodes simulation generalizes over any well-constructed mesh. Once you define your physics, you can run your automatically-generated simulation on the plane, the sphere, and so on.")
+   (p "Decapodes are iterable because new models can be written quickly. You do not have to worry about time spent in developing a simulator for your new model because Decapodes.jl will automatically generate the simulation code for you! This allows an applied scientist to iterate through the scientific method: creating a hypothesis model and then seek to validate (or invalidate) it quickly.")
+   (p "Furthermore, a Decapodes simulation generalizes over any well-constructed mesh. Once you define your physics, you can run your automatically-generated simulation on the plane, the sphere, the teapot, and so on.")
    (h3 "What is the Decapodes Leader Board?")
-   (p "I (Luke Morris) created the Decapodes Leader Board (DLB) initially as a hobby project to keep track of the models that we built for a friend over coffee. However, we soon recognized that the DLB captured the essence of a new workflow that the Decapodes project enables. We emphasize the speed in which accurate simulations for novel models can be created. Of course, modelers are interested in having good models, so we always make sure that our physics are well-formed, but as developers, we want this modeling process to be as efficient as possible. We want it to be so efficient, that one could in fact \"race\" their friends in building them!")
+   (p "I created the Decapodes Leader Board (DLB) as a hobby project to keep track of models that we built. However, we soon recognized that the DLB captured the essence of a new workflow that the Decapodes project enables. We emphasize the speed in which accurate simulations for novel models can be created. Of course, modelers are interested in having good models, so we always make sure that our physics are well-formed, but as developers, we want this modeling process to be as efficient as possible. We want it to be so efficient, that one could in fact \"race\" their friends in building them!")
+   (p "This \"leaderboard\" is somewhat similar to the NASA " (a href:"https://kauai.ccmc.gsfc.nasa.gov/CMEscoreboard/" "CCMC CME Scoreboard") ", where community members compete to predict CMEs accurately, using pre-built models.")
    (h3 "What does Decapodes stand for?")
-   (p (acronym "Discrete Exterior Calculus Applied to Partial and Ordinary Differential Equations"))
-   #| -Embedded in a programming language
-                   -Fast (Because of the DEC.)
-                   -Accurate (Because of the DEC.)
-                   -Composable (Because of ACT formalization)
-                   -Iterable|#
-   (h5 "Site under construction")))
+   (p (acronym "Discrete Exterior Calculus Applied to Partial and Ordinary Differential Equations"))))
 
 #| Footer |#
 (define footer
@@ -196,6 +195,18 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (footer)))
 
 #| Display Page |#
-(output-setup)
-(ox styles)
-(ox front-page)
+(define (render-page)
+  (output-setup)
+  (ox styles)
+  (ox front-page))
+
+(define (open-locally)
+  (define temp-file (make-temporary-file "~a.html"))
+  (with-output-to-file #:exists 'append temp-file render-page)
+  (send-url (path->string temp-file)))
+
+(cond
+  [DEBUG (open-locally)]
+  [else (render-page)])
+
+
