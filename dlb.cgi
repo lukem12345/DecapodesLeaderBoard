@@ -2,8 +2,6 @@
 
 #lang racket/base
 
-(define DEBUG #f)
-
 #|
 Author: Luke Lawlor Morris
 This CGI is meant to keep track of multiphysics simulations in a leader-board format.
@@ -14,8 +12,23 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (require syntax/to-string)
 (require racket/date)
 (require racket/format)
-(require racket/file)
-(require browser/external)
+
+#| Record Data |#
+(struct record (day-code day initials multiphysics link dev-time))
+(define records (list
+                 (record '(10 3 2022) "Mar 10, 2022" "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
+                 (record '(24 4 2024) "April 24, 2024" "GR" "Cahn-Hilliard" "https://algebraicjulia.github.io/Decapodes.jl/dev/ch/cahn-hilliard/" "10 minutes")
+                 (record '(21 7 2023) "July 21, 2023" "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
+                 (record '(7 4 2023) "Apr 7, 2023" "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
+                 (record '(17 2 2023) "Feb 17, 2023" "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
+                 (record '(1 9 2023) "Sep 1, 2023" "LM & GR" "Burgers'" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
+                 (record '(12 7 2023) "July 12, 2023" "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
+                 (record '(11 7 2023) "July 11, 2023" "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
+                 (record '(16 2 2023) "Feb 16, 2023" "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
+                 (record '(17 5 2024) "May 17, 2024" "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
+                 (record '(13 7 2023) "July 13, 2023" "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
+                 (record '(7 2 2023) "Feb 7, 2023" "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
+                 (record '(9 5 2024) "May  9, 2024" "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
 
 #| Timer Helper Functions |#
 (define (seconds->days s) (floor (/ (/ (/ s 60) 60 ) 24)))
@@ -23,25 +36,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (number->string (seconds->days
                    (- (current-seconds)
                       (apply find-seconds day)))))
-(define days-since-record (days-since (list 0 0 0 24 4 2024)))
-(define days-since-entry (days-since (list 0 0 0 9 5 2024)))
-
-#| Record Data |#
-(struct record (day initials multiphysics link dev-time))
-(define records (list
-                 (record "Mar 10, 2022" "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
-                 (record "April 24, 2024" "GR" "Cahn-Hilliard" "https://algebraicjulia.github.io/Decapodes.jl/dev/ch/cahn-hilliard/" "10 minutes")
-                 (record "July 21, 2023" "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
-                 (record "Apr 7, 2023" "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
-                 (record "Feb 17, 2023" "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
-                 (record "Sep 1, 2023" "LM & GR" "Burgers'" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
-                 (record "July 12, 2023" "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
-                 (record "July 11, 2023" "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
-                 (record "Feb 16, 2023" "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
-                 (record "May 17, 2024" "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
-                 (record "July 13, 2023" "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
-                 (record "Feb  7, 2023" "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
-                 (record "May  9, 2024" "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
+(define days-since-record (days-since (append '(0 0 0) (record-day-code (second records)))))
+(define days-since-entry (argmin string->number (map (λ (x) (days-since (append '(0 0 0) (record-day-code x)))) records)))
 
 #| Set up the page |#
 (define ox output-xml)
@@ -92,7 +88,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (tr
     (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
    (map (λ (rec)
-          (tr (td (record-day rec)) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec)))) records)))
+          (tr (td (record-day rec)) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec))))
+        records)))
 
 #| Gallery |#
 (struct picture (title src alt))
@@ -200,13 +197,15 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (ox styles)
   (ox front-page))
 
-(define (open-locally)
-  (define temp-file (make-temporary-file "~a.html"))
-  (with-output-to-file #:exists 'append temp-file render-page)
-  (send-url (path->string temp-file)))
+(render-page)
 
-(cond
-  [DEBUG (open-locally)]
-  [else (render-page)])
-
-
+;; (define DEBUG #t)
+;; (require racket/file)
+;; (require browser/external)
+;; (define (open-locally)
+;;   (define temp-file (make-temporary-file "~a.html"))
+;;   (with-output-to-file #:exists 'append temp-file render-page)
+;;   (send-url (path->string temp-file)))
+;; (cond
+;;   [DEBUG (open-locally)]
+;;   [else (render-page)])
