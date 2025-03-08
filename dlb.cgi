@@ -15,6 +15,9 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (require racket/vector)
 (require racket/treelist)
 
+(define-namespace-anchor ns-a)
+(define ns (namespace-anchor->namespace ns-a))
+
 #| Record Data |#
 (struct record (day-code initials multiphysics link dev-time))
 (define records (list
@@ -32,7 +35,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
                  (record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
                  (record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
 
-#| Timer Helper Functions |#
+#| Time Helper Functions |#
 (define months (vector "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"))
 (define (pretty-date day-code)
   (format "~a ~a, ~a"
@@ -54,6 +57,43 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (ox (doctype 'html))
   (ox (meta name: "viewport" content: "width=device-width; initial-scale=1.0")))
 
+#| Handle user input |#
+(define (check-option lst)
+  (and (not (empty? lst)) (equal? (car lst) "T")))
+
+(define-values (show-leaderboard show-plots show-diagrams)
+  (let* ([bindings (get-bindings/get)]
+         [show-leaderboard-check (extract-bindings "show-leaderboard" bindings)]
+         [show-plots-check (extract-bindings "show-plots" bindings)]
+         [show-diagrams-check (extract-bindings "show-diagrams" bindings)])
+    (values
+     (check-option show-leaderboard-check)
+     (check-option show-plots-check)
+     (check-option show-diagrams-check))))
+
+;; A boolean HTML attribute is (conventionally) only allowed to be set to the name of that attribute.
+;; otherwise, it should not be present.
+(define (bool-attr bool attr)
+  (cond
+    [bool (list (string->symbol (string-append attr ":")) attr)]
+    [else '()]))
+(define (checked-attr to-check)
+   (bool-attr to-check "checked"))
+
+(define (hiding-checkbox to-show)
+  (let* ([id         (string-append "show-" to-show)]
+         [label-val  (string-titlecase to-show)]
+         [active-var (string->symbol id)])
+   (div class:"view-control"
+     (element 'label 'for: id label-val)
+     (apply element 'input 'type: "checkbox" 'id: id 'name: id 'value: "T"
+            (checked-attr (eval active-var ns))))))
+
+(define view-configuration
+  (form action:"./testing.cgi" method:"GET"
+        (hiding-checkbox "leaderboard") (hiding-checkbox "plots") (hiding-checkbox "diagrams")
+        (input type:"submit" value:"Show")))
+
 #| Styles |#
 (define theme-base "#5B9AA0")
 (define theme-accent "orangered")
@@ -67,66 +107,82 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
             a {      color: "theme-accent2"; text-shadow:1px 1px 1px "theme-accent";}
             p {      color: "theme-accent3";}
             strong { color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent";}
-            h1 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 1em; margin-left: 0.5em; }
+            h1 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0em; margin-left: 0.5em; }
             h3 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 1em; }
-            h4 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0.75em; margin-right: 0.5em; position: fixed; float: right; top: 0; right: 0; }
+            h4 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0.75em; margin-left: 0.5em; }
             h5 {     color: "theme-accent3"; }"))
    (style (~a ".picture-frame { width: 300px; display: block; margin-bottom: 1em; border-radius: 10% 10% 10% 10%; border: 3px ridge "theme-accent"; }"))
    (style (~a ".physics-title { width: 300px; display: block; text-align: center; color: "theme-accent3"; margin-bottom: 0.5em; text-shadow:2px 2px 1px "theme-accent"; }"))
-   (style (~a ".floating-header { position: fixed; top: 0px; height: 5em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: #5B9AA0; }"))
-   (style (~a ".main-content { margin-left: 1em; margin-right: 0.5em; }"))
+   (style (~a ".floating-header { position: fixed; top: 0px; height: 7em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: #5B9AA0; }"))
+   (style (~a ".main-content { margin-top: 9em; margin-left: 1em; margin-right: 0.5em; }"))
    (style (~a ".footnote { margin-top: 5px; }"))
+   (style (~a ".view-control { float: left; margin: 1px; padding:2px; }"))
    (style (~a ".gallery { display: flex; flex-wrap: wrap; }"))))
 
 #| Floating Header |#
 (define floating-header
   (div class:"floating-header"
        (h1 "Decapodes Leader Board")
-       (h4 (date->string (current-date)))))
+       (h4 (date->string (current-date))
+       (view-configuration))))
 
 #| Records Announcement |#
 (define records-announcement
-  (div style:"margin-top: 5em;"
-       (h5 "It has been " (strong days-since-record) " days since a new Decapodes world record.")
-       (h5 "It has been " (strong days-since-entry) " days since a new Decapodes entry.")))
+  (cond
+    [show-leaderboard
+      (div style:"margin-top: 5em;"
+           (h5 "It has been " (strong days-since-record) " days since a new Decapodes world record.")
+           (h5 "It has been " (strong days-since-entry) " days since a new Decapodes entry."))]
+    [else (div)]))
 
 #| Records Table i.e. The Leader Board |#
 (define leader-board
-  (table
-   (tr
-    (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
-   (map (λ (rec)
-          (tr (td style:"text-align-last: justify; " (pretty-date (record-day-code rec))) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec))))
-        records)))
+  (cond
+   [show-leaderboard
+     (div
+       (table
+         (tr (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
+         (map (λ (rec)
+                (tr (td style:"text-align-last: justify; " (pretty-date (record-day-code rec))) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec))))
+              records))
+       (hr))]
+   [else (div)]))
 
 #| Gallery |#
 (struct picture (title src alt))
-(define plots (treelist
-               (picture "Multispecies Navier-Stokes" "imgs/multispecies.gif" "A gif of a multispecies Navier-Stokes simulation")
-               (picture "Brusselator Reaction" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
-               (picture "Vorticity Navier-Stokes" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
-               (picture "Cahn-Hilliard" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
-               (picture "Teapot Brusselator Reaction" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
-               (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
-               (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
-               (picture "Budyko-Sellers Climate Model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-               (picture "Burgers' Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
 
-(define new-plots (treelist
-                   (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
-                   (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")))
+(define plots
+  (treelist
+    (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
+    (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+    (picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+    (picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+    (picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
+    (picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
+    (picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
+    (picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
 
-
-(define diagrams (treelist
-                  (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/stream.svg" "A string diagram")
-                  (picture "The Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")))
+(define diagrams
+  (treelist
+    (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram")
+    (picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
+    (picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
+    (picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
+    (picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
+    (picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
 
 (struct scenario (name plot-key diagram-key))
 
 (define scenarios
   (treelist
    (scenario "Vorticity" 0 0)
-   (scenario "Brusselator Teapot" 1 1)))
+   (scenario "Brusselator Teapot" 1 1)
+   (scenario "Brusselator Square" 2 1)
+   (scenario "Brusselator Sphere" 3 1)
+   (scenario "Gray-Scott Sphere" 7 2)
+   (scenario "Budyko-Sellers" 5 4)
+   (scenario "Cahn-Hilliard" 4 5)
+   (scenario "Burgers" 6 3)))
 
 ;; A widget for a plot with a title.
 (define (plot-and-title pic)
@@ -134,53 +190,23 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (i class: "physics-title" (picture-title pic))
    (img class: "picture-frame" src: (picture-src pic) alt: (picture-alt pic))))
 
-(define (check-option lst)
-  (cond [(and
-          (not (empty? lst))
-          (equal? (car lst) "T")) #f]
-        [else #t]))
-
-(define-values (show-plots show-diags)
-  (let* ([bindings (get-bindings/get)]
-         [hide-plots-check (extract-bindings "hide-plots" bindings)]
-         [hide-diags-check (extract-bindings "hide-diags" bindings)])
-    (values
-     (check-option hide-plots-check)
-     (check-option hide-diags-check))))
-
-(define view-configuration
-  (form action:"./dlb.cgi" method:"GET"
-        (label for:"hide-plots" "Hide Plots")
-        (input type:"checkbox" id:"hide-plots" name:"hide-plots" value:"T")
-        (label for:"hide-diags" "Hide Diagrams")
-        (input type:"checkbox" id:"hide-diags" name:"hide-diags" value:"T")
-        (input type:"submit" value:"Submit")))
-
 (define scenario-showcase
-  (div
-   (treelist->list
-    (treelist-map
-     scenarios
-     (λ (scn)
-       (div
-        (let*
-            ([plot (treelist-ref new-plots (scenario-plot-key scn))]
-             [diag (treelist-ref diagrams (scenario-diagram-key scn))])
-          (div
-           (div class:"gallery"
-                (cond [show-plots (plot-and-title plot)])
-                (cond [show-diags (plot-and-title diag)])
-                (hr))))))))))
-
-(define gallery
-  (div class:"gallery"
-       (treelist->list
-        (treelist-map
-         plots
-         (λ (ge)
-           (div
-            (i class: "physics-title" (picture-title ge))
-            (img class: "picture-frame" src: (picture-src ge) alt: (picture-alt ge))))))))
+  (cond
+   [(or show-plots show-diagrams)
+    (div
+     (treelist->list
+      (treelist-map scenarios
+       (λ (scn)
+         (div
+          (let*
+              ([plot (treelist-ref plots (scenario-plot-key scn))]
+               [diag (treelist-ref diagrams (scenario-diagram-key scn))])
+            (div
+             (div class:"gallery"
+                  (cond [show-plots (plot-and-title plot)])
+                  (cond [show-diagrams (plot-and-title diag)]))
+             (hr))))))))]
+    [else (div)]))
 
 #| Decapodes Overview |#
 (define example-decapode-macro
@@ -238,10 +264,13 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 
 #| Footer |#
 (define footer
-  (div style:"margin-top: 195px;"
-       (p class:"footnote" "¹: Honorary permanent number one")
-       (p class:"footnote" "*: Extending a simulation from the unit square to the unit sphere")
-       (p class:"footnote" "**: Starting from pre-formulated Navier-Stokes Decapode")))
+  (cond
+   [show-leaderboard
+    (div style:"margin-top: 195px;"
+         (p class:"footnote" "¹: Honorary permanent number one")
+         (p class:"footnote" "*: Extending a simulation from the unit square to the unit sphere")
+         (p class:"footnote" "**: Starting from pre-formulated Navier-Stokes Decapode"))]
+   [else (div)]))
 
 #| Main |#
 (define front-page
@@ -254,14 +283,10 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
         (records-announcement)
         #| Leader board |#
         (leader-board)
-        #| Gallery |#
-        (hr)
-        (view-configuration)
+        #| Scenario showcase |#
         (scenario-showcase)
         #| Decapodes overview |#
-        (hr)
-        ;;(decapodes-overview)
-        )
+        (decapodes-overview))
    #| Footer |#
    (footer)))
 
