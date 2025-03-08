@@ -12,6 +12,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (require syntax/to-string)
 (require racket/date)
 (require racket/format)
+(require racket/vector)
+(require racket/treelist)
 
 #| Record Data |#
 (struct record (day-code initials multiphysics link dev-time))
@@ -99,22 +101,86 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 
 #| Gallery |#
 (struct picture (title src alt))
-(define pictures (list
-                  (picture "Multispecies Navier-Stokes" "imgs/multispecies.gif" "A gif of a multispecies Navier-Stokes simulation")
-                  (picture "Brusselator Reaction" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
-                  (picture "Vorticity Navier-Stokes" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
-                  (picture "Cahn-Hilliard" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
-                  (picture "Teapot Brusselator Reaction" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
-                  (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
-                  (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
-                  (picture "Budyko-Sellers Climate Model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-                  (picture "Burgers' Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
+(define plots (treelist
+               (picture "Multispecies Navier-Stokes" "imgs/multispecies.gif" "A gif of a multispecies Navier-Stokes simulation")
+               (picture "Brusselator Reaction" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+               (picture "Vorticity Navier-Stokes" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
+               (picture "Cahn-Hilliard" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
+               (picture "Teapot Brusselator Reaction" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+               (picture "Icosphere Brusselator Reaction" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+               (picture "Gray-Scott Reaction" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
+               (picture "Budyko-Sellers Climate Model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
+               (picture "Burgers' Equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")))
+
+(define new-plots (treelist
+                   (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of the 6 co-rotating point vortices according to the Navier-Stokes equations")
+                   (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")))
+
+
+(define diagrams (treelist
+                  (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/stream.svg" "A string diagram")
+                  (picture "The Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")))
+
+(struct scenario (name plot-key diagram-key))
+
+(define scenarios
+  (treelist
+   (scenario "Vorticity" 0 0)
+   (scenario "Brusselator Teapot" 1 1)))
+
+;; A widget for a plot with a title.
+(define (plot-and-title pic)
+  (div
+   (i class: "physics-title" (picture-title pic))
+   (img class: "picture-frame" src: (picture-src pic) alt: (picture-alt pic))))
+
+(define (check-option lst)
+  (cond [(and
+          (not (empty? lst))
+          (equal? (car lst) "T")) #f]
+        [else #t]))
+
+(define-values (show-plots show-diags)
+  (let* ([bindings (get-bindings/get)]
+         [hide-plots-check (extract-bindings "hide-plots" bindings)]
+         [hide-diags-check (extract-bindings "hide-diags" bindings)])
+    (values
+     (check-option hide-plots-check)
+     (check-option hide-diags-check))))
+
+(define view-configuration
+  (form action:"./dlb.cgi" method:"GET"
+        (label for:"hide-plots" "Hide Plots")
+        (input type:"checkbox" id:"hide-plots" name:"hide-plots" value:"T")
+        (label for:"hide-diags" "Hide Diagrams")
+        (input type:"checkbox" id:"hide-diags" name:"hide-diags" value:"T")
+        (input type:"submit" value:"Submit")))
+
+(define scenario-showcase
+  (div
+   (treelist->list
+    (treelist-map
+     scenarios
+     (λ (scn)
+       (div
+        (let*
+            ([plot (treelist-ref new-plots (scenario-plot-key scn))]
+             [diag (treelist-ref diagrams (scenario-diagram-key scn))])
+          (div
+           (div class:"gallery"
+                (cond [show-plots (plot-and-title plot)])
+                (cond [show-diags (plot-and-title diag)])
+                (hr))))))))))
+
 (define gallery
   (div class:"gallery"
-       (map (λ (ge)
-              (div
-               (i class: "physics-title" (picture-title ge))
-               (img class: "picture-frame" src: (picture-src ge) alt: (picture-alt ge)))) pictures)))
+       (treelist->list
+        (treelist-map
+         plots
+         (λ (ge)
+           (div
+            (i class: "physics-title" (picture-title ge))
+            (img class: "picture-frame" src: (picture-src ge) alt: (picture-alt ge))))))))
 
 #| Decapodes Overview |#
 (define example-decapode-macro
@@ -190,10 +256,12 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
         (leader-board)
         #| Gallery |#
         (hr)
-        (gallery)
+        (view-configuration)
+        (scenario-showcase)
         #| Decapodes overview |#
         (hr)
-        (decapodes-overview))
+        ;;(decapodes-overview)
+        )
    #| Footer |#
    (footer)))
 
@@ -204,14 +272,3 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (ox front-page))
 
 (render-page)
-
-;; (define DEBUG #t)
-;; (require racket/file)
-;; (require browser/external)
-;; (define (open-locally)
-;;   (define temp-file (make-temporary-file "~a.html"))
-;;   (with-output-to-file #:exists 'append temp-file render-page)
-;;   (send-url (path->string temp-file)))
-;; (cond
-;;   [DEBUG (open-locally)]
-;;   [else (render-page)])
