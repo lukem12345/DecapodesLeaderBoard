@@ -127,6 +127,14 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
        (h4 (date->string (current-date))
            (view-configuration))))
 
+#| Instructions |#
+(define instructions
+  (cond
+    [(not (or show-leaderboard show-plots show-diagrams))
+     (div style:"margin-top: 5em;"
+          (h5 style:"font-style: italic" "Show the leaderboard, simulation GIFs, and/ or Decapode diagrams by selecting options at the top menu."))]
+    [else (div)]))
+
 #| Records Announcement |#
 (define records-announcement
   (cond
@@ -283,6 +291,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (floating-header)
    #| Main Content |#
    (div class:"main-content"
+        #| Instructions |#
+        (instructions)
         #| Days-since-new-record |#
         (records-announcement)
         #| Leader board |#
