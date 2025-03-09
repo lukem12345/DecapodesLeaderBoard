@@ -150,27 +150,29 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
     [else (div)]))
 
 #| Database of Plots and Diagrams |#
-(struct picture (title src alt))
+(struct picture (title src alt width))
+(define (m-picture title src alt #:width [width "300px"])
+  (picture title src alt width))
 
 (define plots
   (treelist
-   (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
-   (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
-   (picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
-   (picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
-   (picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
-   (picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-   (picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
-   (picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
+   (m-picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
+   (m-picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+   (m-picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+   (m-picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+   (m-picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
+   (m-picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
+   (m-picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
+   (m-picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
 
 (define diagrams
   (treelist
-   (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram")
-   (picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
-   (picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
-   (picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
-   (picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
-   (picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
+   (m-picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram" #:width "150px")
+   (m-picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
+   (m-picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
+   (m-picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
+   (m-picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
+   (m-picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
 
 (struct scenario (name plot-key diagram-key))
 
@@ -189,7 +191,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define (plot-and-title pic)
   (div
    (i class: "physics-title" (picture-title pic))
-   (img class: "picture-frame" src: (picture-src pic) alt: (picture-alt pic))))
+   (img class: "picture-frame" style: (~a "width: "(picture-width pic)) src: (picture-src pic) alt: (picture-alt pic))))
 
 (define scenario-showcase
   (cond
