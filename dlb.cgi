@@ -20,20 +20,21 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 
 #| Record Data |#
 (struct record (day-code initials multiphysics link dev-time))
-(define records (list
-                 (record '(10 3 2022) "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
-                 (record '(24 4 2024) "GR" "Cahn-Hilliard" "https://algebraicjulia.github.io/Decapodes.jl/dev/ch/cahn-hilliard/" "10 minutes")
-                 (record '(21 7 2023) "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
-                 (record '(7  4 2023) "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
-                 (record '(17 2 2023) "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
-                 (record '(1  9 2023) "LM & GR" "Burgers'" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
-                 (record '(12 7 2023) "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
-                 (record '(11 7 2023) "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
-                 (record '(16 2 2023) "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
-                 (record '(17 5 2024) "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
-                 (record '(13 7 2023) "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
-                 (record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
-                 (record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
+(define records
+  (list
+   (record '(10 3 2022) "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
+   (record '(24 4 2024) "GR" "Cahn-Hilliard" "https://algebraicjulia.github.io/Decapodes.jl/dev/ch/cahn-hilliard/" "10 minutes")
+   (record '(21 7 2023) "GR" "Teacup Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/brusselator_teapot.jl#L177" "15 minutes*")
+   (record '(7  4 2023) "LM" "Gray-Scott" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/chemistry/gray_scott.jl" "15 minutes")
+   (record '(17 2 2023) "GR" "Icosphere-Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl#L177" "15 minutes*")
+   (record '(1  9 2023) "LM & GR" "Burgers'" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/145" "30 minutes")
+   (record '(12 7 2023) "LM" "Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/cism/" "2 hours")
+   (record '(11 7 2023) "LM" "Budyko-Sellers" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/budyko_sellers.jl" "2 hours")
+   (record '(16 2 2023) "LM & GR" "Brusselator" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/brusselator/brusselator.jl" "2 hours")
+   (record '(17 5 2024) "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
+   (record '(13 7 2023) "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/" "4 hours")
+   (record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
+   (record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
 
 #| Time Helper Functions |#
 (define months (vector "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"))
@@ -78,16 +79,16 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
     [bool (list (string->symbol (string-append attr ":")) attr)]
     [else '()]))
 (define (checked-attr to-check)
-   (bool-attr to-check "checked"))
+  (bool-attr to-check "checked"))
 
 (define (hiding-checkbox to-show)
-  (let* ([id         (string-append "show-" to-show)]
-         [label-val  (string-titlecase to-show)]
-         [active-var (string->symbol id)])
-   (div class:"view-control"
-     (element 'label 'for: id label-val)
-     (apply element 'input 'type: "checkbox" 'id: id 'name: id 'value: "T"
-            (checked-attr (eval active-var ns))))))
+  (define id (string-append "show-" to-show))
+  (define label-val (string-titlecase to-show))
+  (define active-var (string->symbol id))
+  (div class:"hiding-checkbox"
+       (element 'label 'for: id label-val)
+       (apply element 'input 'type: "checkbox" 'id: id 'name: id 'value: "T"
+              (checked-attr (eval active-var ns)))))
 
 (define view-configuration
   (form action:"./testing.cgi" method:"GET"
@@ -116,60 +117,60 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (style (~a ".floating-header { position: fixed; top: 0px; height: 7em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: #5B9AA0; }"))
    (style (~a ".main-content { margin-top: 9em; margin-left: 1em; margin-right: 0.5em; }"))
    (style (~a ".footnote { margin-top: 5px; }"))
-   (style (~a ".view-control { float: left; margin: 1px; padding:2px; }"))
-   (style (~a ".gallery { display: flex; flex-wrap: wrap; }"))))
+   (style (~a ".hiding-checkbox { float: left; margin: 1px; padding:2px; }"))
+   (style (~a ".plot-and-diagram { display: flex; flex-wrap: wrap; }"))))
 
 #| Floating Header |#
 (define floating-header
   (div class:"floating-header"
        (h1 "Decapodes Leader Board")
        (h4 (date->string (current-date))
-       (view-configuration))))
+           (view-configuration))))
 
 #| Records Announcement |#
 (define records-announcement
   (cond
     [show-leaderboard
-      (div style:"margin-top: 5em;"
-           (h5 "It has been " (strong days-since-record) " days since a new Decapodes world record.")
-           (h5 "It has been " (strong days-since-entry) " days since a new Decapodes entry."))]
+     (div style:"margin-top: 5em;"
+          (h5 "It has been " (strong days-since-record) " days since a new Decapodes world record.")
+          (h5 "It has been " (strong days-since-entry) " days since a new Decapodes entry."))]
     [else (div)]))
 
 #| Records Table i.e. The Leader Board |#
 (define leader-board
   (cond
-   [show-leaderboard
+    [show-leaderboard
      (div
-       (table
-         (tr (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
-         (map (λ (rec)
-                (tr (td style:"text-align-last: justify; " (pretty-date (record-day-code rec))) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec))))
-              records))
-       (hr))]
-   [else (div)]))
+      (table
+       (tr (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
+       (map (λ (rec)
+              (tr (td style:"text-align-last: justify; " (pretty-date (record-day-code rec))) (td (record-initials rec)) (td (a href: (record-link rec) (record-multiphysics rec))) (td (record-dev-time rec))))
+            records))
+      (hr))]
+    [else (div)]))
 
-#| Gallery |#
+#| Database of Plots and Diagrams |#
 (struct picture (title src alt))
 
 (define plots
   (treelist
-    (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
-    (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
-    (picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
-    (picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
-    (picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
-    (picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-    (picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
-    (picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
+   (picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
+   (picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+   (picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+   (picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+   (picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
+   (picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
+   (picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
+   (picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
 
 (define diagrams
   (treelist
-    (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram")
-    (picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
-    (picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
-    (picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
-    (picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
-    (picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
+   (picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram")
+   (picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
+   (picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
+   (picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
+   (picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
+   (picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
 
 (struct scenario (name plot-key diagram-key))
 
@@ -192,20 +193,21 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 
 (define scenario-showcase
   (cond
-   [(or show-plots show-diagrams)
-    (div
-     (treelist->list
-      (treelist-map scenarios
-       (λ (scn)
-         (div
-          (let*
-              ([plot (treelist-ref plots (scenario-plot-key scn))]
-               [diag (treelist-ref diagrams (scenario-diagram-key scn))])
-            (div
-             (div class:"gallery"
-                  (cond [show-plots (plot-and-title plot)])
-                  (cond [show-diagrams (plot-and-title diag)]))
-             (hr))))))))]
+    [(or show-plots show-diagrams)
+     (div
+      (treelist->list
+       (treelist-map
+        scenarios
+        (λ (scn)
+          (div
+           (let*
+               ([plot (treelist-ref plots (scenario-plot-key scn))]
+                [diag (treelist-ref diagrams (scenario-diagram-key scn))])
+             (div
+              (div class:"plot-and-diagram"
+                   (cond [show-plots (plot-and-title plot)])
+                   (cond [show-diagrams (plot-and-title diag)]))
+              (hr))))))))]
     [else (div)]))
 
 #| Decapodes Overview |#
@@ -265,12 +267,12 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 #| Footer |#
 (define footer
   (cond
-   [show-leaderboard
-    (div style:"margin-top: 195px;"
-         (p class:"footnote" "¹: Honorary permanent number one")
-         (p class:"footnote" "*: Extending a simulation from the unit square to the unit sphere")
-         (p class:"footnote" "**: Starting from pre-formulated Navier-Stokes Decapode"))]
-   [else (div)]))
+    [show-leaderboard
+     (div style:"margin-top: 195px;"
+          (p class:"footnote" "¹: Honorary permanent number one")
+          (p class:"footnote" "*: Extending a simulation from the unit square to the unit sphere")
+          (p class:"footnote" "**: Starting from pre-formulated Navier-Stokes Decapode"))]
+    [else (div)]))
 
 #| Main |#
 (define front-page
