@@ -91,7 +91,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
               (checked-attr (eval active-var ns)))))
 
 (define view-configuration
-  (form action:"./testing.cgi" method:"GET"
+  (form action:"./dlb.cgi" method:"GET"
         (hiding-checkbox "leaderboard") (hiding-checkbox "plots") (hiding-checkbox "diagrams")
         (input type:"submit" value:"Show")))
 
