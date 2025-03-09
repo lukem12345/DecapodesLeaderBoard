@@ -18,8 +18,15 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define-namespace-anchor ns-a)
 (define ns (namespace-anchor->namespace ns-a))
 
-#| Record Data |#
+#| Database of records, plots, and diagrams |#
 (struct record (day-code initials multiphysics link dev-time))
+
+(struct picture (title src alt width))
+(define (m-picture title src alt #:width [width "300px"])
+  (picture title src alt width))
+
+(struct scenario (name plot-key diagram-key))
+
 (define records
   (list
    (record '(10 3 2022) "AB" "Navier-Stokes" "https://github.com/AlgebraicJulia/DECAPODES-Benchmarks" "18 months¹")
@@ -36,6 +43,60 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours**")
    (record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
 
+#| Database of Plots and Diagrams |#
+
+(define plots
+  (treelist
+   (m-picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
+   (m-picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
+   (m-picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
+   (m-picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
+   (m-picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
+   (m-picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
+   (m-picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
+   (m-picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
+   (m-picture "\"Halfar's dome\"" "imgs/ice_dynamics_cism.gif" "A gif of Halfar's equation on a plane")
+   (m-picture "Halfar's equation on PIOMAS data" "imgs/piomas_after.png" "PIOMAS ice thickness diffused on a globe")
+   (m-picture "Fluid Energetic Electron Dissipation" "imgs/kim.gif" "A gif of electron flux")
+   (m-picture "\"Veronis\" lightning model" "imgs/veronis.gif" "A gif of a lightning strike")
+   (m-picture "Klausmeier's vegetation model" "imgs/klausmeier.gif" "A gif of traveling vegetation waves")
+   (m-picture "Gompertz growth oncology model" "imgs/gompertz.png" "Tumor proliferation")
+   (m-picture "Porous media flow" "imgs/porous.gif" "A gif of flow in porous media")))
+
+(define diagrams
+  (treelist
+   (m-picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram" #:width "150px")
+   (m-picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
+   (m-picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
+   (m-picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
+   (m-picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
+   (m-picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")
+   (m-picture "Halfar's equation" "imgs/halfar.svg" "A string diagram")
+   (m-picture "Kim's Fluid Energetic Electron Dissipation (FEED)" "imgs/kim.svg" "A string diagram")
+   (m-picture "Klausmeier vegetation model" "imgs/klausmeier.svg" "A string diagram")
+   (m-picture "Gompertz tumor proliferation-invasion model" "imgs/oncology.svg" "A string diagram")
+   (m-picture "Porous convection" "imgs/porous.svg" "A string diagram")
+   (m-picture "Veronis, Inan, Pasko, Bell lightning model" "imgs/veronis.svg" "A string diagram")))
+
+(define scenarios
+  (treelist
+   (scenario "Vorticity" 0 0)
+   (scenario "Brusselator Teapot" 1 1)
+   (scenario "Brusselator Square" 2 1)
+   (scenario "Brusselator Sphere" 3 1)
+   (scenario "Halfar Dome" 8 6)
+   (scenario "Halfar PIOMAS" 9 6)
+   (scenario "Gray-Scott Sphere" 7 2)
+   (scenario "FEED" 10 7)
+   (scenario "Veronis" 11 11)
+   (scenario "Klausmeier" 12 8)
+   (scenario "Budyko-Sellers" 5 4)
+   (scenario "Cahn-Hilliard" 4 5)
+   (scenario "Oncology" 13 9)
+   (scenario "Porous" 14 10)
+   (scenario "Burgers" 6 3)))
+
+
 #| Time Helper Functions |#
 (define months (vector "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"))
 (define (pretty-date day-code)
@@ -44,12 +105,15 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
           (first day-code)
           (third day-code)))
 (define (seconds->days s) (floor (/ (/ (/ s 60) 60 ) 24)))
+(define (mdy day-code) (append '(0 0 0) day-code))
 (define (days-since day)
   (number->string (seconds->days
                    (- (current-seconds)
                       (apply find-seconds day)))))
-(define days-since-record (days-since (append '(0 0 0) (record-day-code (second records)))))
-(define days-since-entry (argmin string->number (map (λ (x) (days-since (append '(0 0 0) (record-day-code x)))) records)))
+(define days-since-record (days-since (mdy (record-day-code (second records)))))
+(define days-since-entry (argmin string->number
+                                 (map (λ (x) (days-since (mdy (record-day-code x))))
+                                      records)))
 
 #| Set up the page |#
 (define ox output-xml)
@@ -73,7 +137,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
      (check-option show-diagrams-check))))
 
 ;; A boolean HTML attribute is (conventionally) only allowed to be set to the name of that attribute.
-;; otherwise, it should not be present.
+;; Otherwise, it should not be present.
 (define (bool-attr bool attr)
   (cond
     [bool (list (string->symbol (string-append attr ":")) attr)]
@@ -81,6 +145,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define (checked-attr to-check)
   (bool-attr to-check "checked"))
 
+;; A widget for checkboxes that hide elements according to a globabl variable.
 (define (hiding-checkbox to-show)
   (define id (string-append "show-" to-show))
   (define label-val (string-titlecase to-show))
@@ -96,29 +161,30 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
         (input type:"submit" value:"Show")))
 
 #| Styles |#
-(define theme-base "#5B9AA0")
+(define theme-base "#4A7C82")
 (define theme-accent "orangered")
 (define theme-accent2 "coral")
 (define theme-accent3 "white")
-(define (styles)
-  (list 
-   (style (~a "
-            body { font-family: arial; background-color:"theme-base"; position: relative; width: 100%; padding: 0; margin: 0; }
-            table, th, td { border-style: ridge}
-            a {      color: "theme-accent2"; text-shadow:1px 1px 1px "theme-accent";}
-            p {      color: "theme-accent3";}
-            strong { color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent";}
-            h1 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0em; margin-left: 0.5em; }
-            h3 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 1em; }
-            h4 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0.75em; margin-left: 0.5em; }
-            h5 {     color: "theme-accent3"; }"))
-   (style (~a ".picture-frame { width: 300px; display: block; margin-bottom: 1em; border-radius: 10% 10% 10% 10%; border: 3px ridge "theme-accent"; }"))
-   (style (~a ".physics-title { width: 300px; display: block; text-align: center; color: "theme-accent3"; margin-bottom: 0.5em; text-shadow:2px 2px 1px "theme-accent"; }"))
-   (style (~a ".floating-header { position: fixed; top: 0px; height: 7em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: #5B9AA0; }"))
-   (style (~a ".main-content { margin-top: 9em; margin-left: 1em; margin-right: 0.5em; }"))
-   (style (~a ".footnote { margin-top: 5px; }"))
-   (style (~a ".hiding-checkbox { float: left; margin: 1px; padding:2px; }"))
-   (style (~a ".plot-and-diagram { display: flex; flex-wrap: wrap; }"))))
+(define styles
+  (style
+    (~a "
+        body { font-family: arial; background-color:"theme-base"; position: relative; width: 100%; padding: 0; margin: 0; }
+        table, th, td { border-style: ridge}
+        a {      color: "theme-accent2"; text-shadow:1px 1px 1px "theme-accent";}
+        p {      color: "theme-accent3";}
+        strong { color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent";}
+        h1 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0em; margin-left: 0.5em; }
+        h3 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 1em; }
+        h4 {     color: "theme-accent3"; text-shadow:2px 2px 1px "theme-accent"; margin-top: 0.75em; margin-left: 0.5em; }
+        h5 {     color: "theme-accent3"; }
+
+        .picture-frame { width: 300px; display: block; margin-bottom: 1em; border-radius: 10% 10% 10% 10%; border: 3px ridge "theme-accent"; }
+        .physics-title { width: 300px; display: block; text-align: center; color: "theme-accent3"; margin-bottom: 0.5em; text-shadow:2px 2px 1px "theme-accent"; }
+        .floating-header { position: fixed; top: 0px; height: 7em; width: 100%; padding: 0; margin: 0; background-color:coral; border-style:none none dashed none; border-color: "theme-base"; }
+        .main-content { margin-top: 9em; margin-left: 1em; margin-right: 0.5em; }
+        .footnote { margin-top: 5px; }
+        .hiding-checkbox { float: left; margin: 1px; padding:2px; }
+        .plot-and-diagram { display: flex; flex-wrap: wrap; }")))
 
 #| Floating Header |#
 (define floating-header
@@ -156,44 +222,6 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
             records))
       (hr))]
     [else (div)]))
-
-#| Database of Plots and Diagrams |#
-(struct picture (title src alt width))
-(define (m-picture title src alt #:width [width "300px"])
-  (picture title src alt width))
-
-(define plots
-  (treelist
-   (m-picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
-   (m-picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
-   (m-picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
-   (m-picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
-   (m-picture "Cahn-Hilliard equation on a square" "imgs/cahnhilliard.gif" "A gif of the Cahn-Hilliard phasefield equation")
-   (m-picture "Budyko-Sellers climate model" "imgs/budyko_sellers.gif" "A gif of the Budyko-Sellers climate model")
-   (m-picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
-   (m-picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")))
-
-(define diagrams
-  (treelist
-   (m-picture "Streamfunction-vorticity form of the incompressible Navier-Stokes equations" "imgs/vort.svg" "A string diagram" #:width "150px")
-   (m-picture "Brusselator auto-catalytic reaction" "imgs/bruss.svg" "A string diagram")
-   (m-picture "Gray-Scott reaction-diffusion" "imgs/grayscott.svg" "A string diagram")
-   (m-picture "Burgers' equation" "imgs/burgers.svg" "A string diagram")
-   (m-picture "Budyko-Sellers climate model" "imgs/budykosellers.svg" "A string diagram")
-   (m-picture "Cahn-Hilliard equation" "imgs/cahnhilliard.svg" "A string diagram")))
-
-(struct scenario (name plot-key diagram-key))
-
-(define scenarios
-  (treelist
-   (scenario "Vorticity" 0 0)
-   (scenario "Brusselator Teapot" 1 1)
-   (scenario "Brusselator Square" 2 1)
-   (scenario "Brusselator Sphere" 3 1)
-   (scenario "Gray-Scott Sphere" 7 2)
-   (scenario "Budyko-Sellers" 5 4)
-   (scenario "Cahn-Hilliard" 4 5)
-   (scenario "Burgers" 6 3)))
 
 ;; A widget for a plot with a title.
 (define (plot-and-title pic)
@@ -311,3 +339,4 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (ox front-page))
 
 (render-page)
+
