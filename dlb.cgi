@@ -162,7 +162,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define regular-shadowing (~a "color: "main-text-color"; text-shadow:2px 2px 1px "theme-accent1";"))
 (define styles
   (style
-    (~a "
+   (~a "
         body { font-family: -apple-system, BlinkMacSystemFont, arial; background-color:"theme-base";
                position: relative; width: 100%; padding: 0; margin: 0; }
         table, th, td { border-style: ridge}
@@ -215,22 +215,22 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define (leader-board)
   (when show-leaderboard
     (div
-      (table
-        (tr (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
-        (let ([fcount 0])
-          (map
-           (λ (rec)
-             (tr
-               (td style:"text-align-last: justify; " (pretty-date (record-day-code rec)))
-               (td (record-initials rec))
-               (td (a-record rec))
-               (td (if (non-empty-string? (record-fnote rec))
-                       (begin
-                         (set! fcount (add1 fcount))
-                         (~a (record-dev-time rec) (make-string fcount #\*)))
-                       (record-dev-time rec)))))
-           records)))
-      (hr))))
+     (table
+      (tr (th "Date") (th "Initials") (th "Multiphysics") (th "Dev Time"))
+      (let ([fcount 0])
+        (map
+         (λ (rec)
+           (tr
+            (td style:"text-align-last: justify; " (pretty-date (record-day-code rec)))
+            (td (record-initials rec))
+            (td (a-record rec))
+            (td (if (non-empty-string? (record-fnote rec))
+                    (begin
+                      (set! fcount (add1 fcount))
+                      (~a (record-dev-time rec) (make-string fcount #\*)))
+                    (record-dev-time rec)))))
+         records)))
+     (hr))))
 
 ;; A widget for a plot with a title.
 (define (plot-and-title pic)
@@ -242,15 +242,15 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define (scenario-showcase)
   (when (or show-plots show-diagrams)
     (div (vector->list (vector-map
-                         (λ (scn)
-                           (div (let
-                                  ([plot (vector-ref plots (scenario-has-plot scn))]
-                                   [diag (vector-ref diagrams (scenario-has-diagram scn))])
-                                  (div (div class:"plot-and-diagram"
-                                            (when show-plots (plot-and-title plot))
-                                            (when show-diagrams (plot-and-title diag)))
-                                       (hr)))))
-                         scenarios)))))
+                        (λ (scn)
+                          (div (let
+                                   ([plot (vector-ref plots (scenario-has-plot scn))]
+                                    [diag (vector-ref diagrams (scenario-has-diagram scn))])
+                                 (div (div class:"plot-and-diagram"
+                                           (when show-plots (plot-and-title plot))
+                                           (when show-diagrams (plot-and-title diag)))
+                                      (hr)))))
+                        scenarios)))))
 
 #| Decapodes Overview |#
 (define (example-decapode-macro)
