@@ -47,7 +47,8 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-record '(17 5 2024) "LM" "Navier-Stokes, Vorticity" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "2 hours")
    (m-record '(13 7 2023) "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/nhs_lite" "4 hours")
    (m-record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours" #:fnote "Starting from pre-formulated Navier-Stokes Decapode")
-   (m-record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")))
+   (m-record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")
+   (m-record '(13 1 2025) "GR" "Porous Convection" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/297/" "-")))
 
 (define plots
   (vector
@@ -166,7 +167,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
         body { font-family: -apple-system, BlinkMacSystemFont, arial; background-color:"theme-base";
                position: relative; width: 100%; padding: 0; margin: 0; }
         table, th, td { border-style: ridge}
-        pre { color: white; display:block; margin-left:auto; margin-right:auto;
+        pre { color: white; display:block; margin-left:auto; margin-right:auto; font-size:10px;
               background-color: black; max-width: 600px; border-radius: 10%;
               border: 6px ridge "theme-accent1"; }
         p {      color: "main-text-color"; }
@@ -184,10 +185,10 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
         .floating-header { position: fixed; top: 0px; height: 7em; width: 100%; padding: 0; margin: 0;
                            background-color:"theme-accent2"; border-style:none none dashed none;
                            border-color: "theme-base"; }
-        .main-content { margin-top: 9em; margin-left: 1em; margin-right: 0.5em; }
+        .main-content { margin-top: 9em; margin-left: 1em; margin-right: 1em; margin-bottom: 2em; }
         .footnote { margin-top: 5px; }
         .hiding-checkbox { float: left; margin: 1px; padding:2px; }
-        .plot-and-diagram { display: flex; flex-wrap: wrap; }")))
+        .plot-and-diagram { display: flex; flex-wrap: wrap; justify-content: center; }")))
 (define (a-record rec)
   (a href: (record-link rec) (record-multiphysics rec)))
 
@@ -308,15 +309,17 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (p "Constructing Decapodes is fast because you specify them exactly how you write your PDEs written in the Discrete Exterior Calculus.")
    (p "For example, we can write the equations for the Brusselator reaction like so:")
    (example-decapode-macro)
-   (p "Constructing complex multiphysics systems from simpler, component systems is fast because we use the technique of operadic composition. That is, we can construct complex multiphysics systems by declaring variables which are shared between components.")
+   (p "Constructing complex multiphysics systems from simpler, component systems is fast because we use the technique of operadic composition. That is, we can construct complex multiphysics systems by declaring variables which are shared between components:")
+   (i class:"physics-title" style: "display:block; margin-left:auto; margin-right:auto; width: 150px; text-align: center; color: white; margin-bottom: 0.5em; margin-left: auto; " "A climate model composition pattern")
+   (img class:"picture-frame" style: "display:block; margin-left:auto; margin-right:auto; width: 325px;" src: "imgs/bshw.svg" alt: "A composition diagram involving a Budyko-Sellers component, a melting component, a warming component, and a Halfar ice dynamics component.")
    (p "Rather than slowing us down, having formal descriptions of multiphysics diagrams enables us to develop models more quickly by providing all the information that you need to encode your multiphysics upfront.")
    (h3 "What makes Decapodes simulations fast?")
-   (p "Decapodes simulations are fast because their operators are implemented as matrix-vector multiplications or kernel operations. This is a property of the Discrete Exterior Calculus. Compounding on this, the auto-generated simulations consist of performant Julia code, and interface nicely with Julia packages like " (a href:"https://docs.sciml.ai/DiffEqDocs/stable/" "DifferentialEquations.jl") ":")
+   (p "Decapodes' operators are implemented as matrix-vector multiplications or kernel operations. This is a property of the Discrete Exterior Calculus. Compounding on this, the auto-generated simulations consist of performant Julia code, and interface nicely with Julia packages like " (a href:"https://docs.sciml.ai/DiffEqDocs/stable/" "DifferentialEquations.jl") ":")
    (example-solve)
    (h3 "What makes Decapodes accurate?")
-   (p "Decapodes simulations are written in the Discrete Exterior Calculus (DEC). In the DEC, discrete operators obey the same useful laws that they obey in the continuous case. One is that the exterior derivative, d, exhibits the property that dd = 0. This is sometimes called " (a href:"https://en.wikipedia.org/wiki/Mimesis_(mathematics)" "mimesis")".")
+   (p "Decapodes are written in the Discrete Exterior Calculus (DEC). In the DEC, discrete operators obey the same useful laws that they obey in the continuous case. One is that the exterior derivative, d, exhibits the property that dd = 0. This is sometimes called " (a href:"https://en.wikipedia.org/wiki/Mimesis_(mathematics)" "mimesis")".")
    (h3 "What makes Decapodes iterable?")
-   (p "Decapodes are can be written quickly in an embedded domain-specific language (eDSL). You do not have to worry about time spent in developing a simulator for your new model because Decapodes.jl will automatically generate the simulation code for you! This allows an applied scientist to iterate through the scientific method: creating a hypothesis model and then seek to validate (or invalidate) it quickly.")
+   (p "Decapodes are written in an embedded domain-specific language (eDSL). You do not have to worry about time spent in developing a simulator for your new model because Decapodes.jl will automatically generate the simulation code for you! This allows an applied scientist to iterate through the scientific method: creating a hypothesis model and then seek to validate (or invalidate) it quickly.")
    (p "Furthermore, a Decapodes simulation generalizes over any well-constructed mesh. Once you define your physics, you can run your automatically-generated simulation on the plane, the sphere, the teapot, and so on.")
    (h3 "What is the Decapodes Leader Board?")
    (p "I created the Decapodes Leader Board (DLB) as a hobby project to keep track of models that we built. However, we soon recognized that the DLB captured the essence of a new workflow that the Decapodes project enables. We emphasize the speed in which accurate simulations for novel models can be created. Of course, modelers are interested in having good models, so we always make sure that our physics are well-formed, but as developers, we want this modeling process to be as efficient as possible. We want it to be so efficient, that one could in fact \"race\" their friends in building them!")
