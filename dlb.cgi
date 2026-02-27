@@ -48,7 +48,30 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-record '(13 7 2023) "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/nhs_lite" "4 hours")
    (m-record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours" #:fnote "Starting from pre-formulated Navier-Stokes Decapode")
    (m-record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")
-   (m-record '(13 1 2025) "GR" "Porous Convection" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/297/" "-")))
+   (m-record '(13 1 2025) "GR" "Porous Convection" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/297/" "-")
+   ;; no GIF in docs
+   (m-record '(2  5 2023) "LM" "Shallow Water" "https://github.com/AlgebraicJulia/Decapodes.jl/tree/main/examples/sw" "-")
+   ;; GIF: scp Decapodes.jl/docs/src/grigoriev/grigoriev.gif imgs/grigoriev.gif
+   (m-record '(6  6 2024) "GR" "Grigoriev Ice Cap" "https://algebraicjulia.github.io/Decapodes.jl/dev/grigoriev/grigoriev/" "-")
+   ;; GIFs: scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_T.gif imgs/bsh_T.gif
+   ;;        scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_h.gif imgs/bsh_h.gif
+   (m-record '(6  6 2024) "GR" "Budyko-Sellers-Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/bsh/budyko_sellers_halfar/" "-")
+   ;; GIF: scp Decapodes.jl/docs/src/halmo/halmo_ice.gif imgs/halmo.gif
+   (m-record '(6  6 2024) "GR" "Halfar-Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/halmo/halmo/" "-")
+   ;; no GIF in docs
+   (m-record '(15 5 2024) "LM & GR" "Heat" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/diff_adv/heat.jl" "-")
+   ;; no GIF in docs
+   (m-record '(15 5 2024) "LM & GR" "Conjugate Heat Transfer" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/diff_adv/cht.jl" "-")
+   ;; no GIF in docs (generated at runtime)
+   (m-record '(4  12 2024) "LM" "Halfar-EBM-Water" "https://algebraicjulia.github.io/Decapodes.jl/dev/ebm_melt/ebm_melt/" "-")
+   ;; GIF: scp Decapodes.jl/docs/src/fokker_planck/fokker_planck.gif imgs/fokker_planck.gif
+   (m-record '(30 1 2025) "MC" "Fokker-Planck" "https://algebraicjulia.github.io/Decapodes.jl/dev/fokker_planck/fokker_planck/" "-")
+   ;; video (mhd.mp4) rather than GIF in docs
+   (m-record '(30 1 2025) "MC" "Magnetohydrodynamics" "https://algebraicjulia.github.io/Decapodes.jl/dev/examples/mhd/" "-")
+   ;; no GIF in docs
+   (m-record '(30 1 2025) "MC" "Tumor Proliferation-Invasion" "https://algebraicjulia.github.io/Decapodes.jl/dev/examples/oncology/tumor_proliferation_invasion/" "-")
+   ;; no GIF in docs
+   (m-record '(6  3 2025) "LM" "Navier-Stokes, Cahn-Hilliard" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/mpf.jl" "-")))
 
 (define plots
   (vector
@@ -66,7 +89,17 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-picture "\"Veronis\" lightning model" "imgs/veronis.gif" "A gif of a lightning strike")
    (m-picture "Klausmeier's vegetation model" "imgs/klausmeier.gif" "A gif of traveling vegetation waves")
    (m-picture "Gompertz growth oncology model" "imgs/gompertz.png" "Tumor proliferation")
-   (m-picture "Porous media flow" "imgs/porous.gif" "A gif of flow in porous media")))
+   (m-picture "Porous media flow" "imgs/porous.gif" "A gif of flow in porous media")
+   ;; scp Decapodes.jl/docs/src/grigoriev/grigoriev.gif imgs/grigoriev.gif
+   (m-picture "Grigoriev ice cap" "imgs/grigoriev.gif" "A gif of Halfar ice flow on the Grigoriev ice cap, Kyrgyzstan")
+   ;; scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_T.gif imgs/bsh_T.gif
+   (m-picture "Budyko-Sellers-Halfar surface temperature" "imgs/bsh_T.gif" "A gif of surface temperature in the Budyko-Sellers-Halfar model")
+   ;; scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_h.gif imgs/bsh_h.gif
+   (m-picture "Budyko-Sellers-Halfar ice height" "imgs/bsh_h.gif" "A gif of ice height in the Budyko-Sellers-Halfar model")
+   ;; scp Decapodes.jl/docs/src/halmo/halmo_ice.gif imgs/halmo.gif
+   (m-picture "Halfar-Navier-Stokes ice thickness" "imgs/halmo.gif" "A gif of ice thickness in the HALMO coupled ice and water model")
+   ;; scp Decapodes.jl/docs/src/fokker_planck/fokker_planck.gif imgs/fokker_planck.gif
+   (m-picture "Fokker-Planck probability density on a sphere" "imgs/fokker_planck.gif" "A gif of a probability density function evolving on an icosphere")))
 
 (define diagrams
   (vector
