@@ -48,28 +48,21 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-record '(13 7 2023) "LM" "Nonhydrostatic Buoyant Seawater" "https://algebraicjulia.github.io/Decapodes.jl/dev/nhs/nhs_lite" "4 hours")
    (m-record '(7  2 2023) "LM & JC & JG" "Multispecies Navier-Stokes" "https://github.com/AlgebraicJulia/Decapodes.jl/issues/70#issuecomment-1421598346" "5 hours" #:fnote "Starting from pre-formulated Navier-Stokes Decapode")
    (m-record '(9  5 2024) "LM" "Vorticity Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/navier_stokes/ns/" "-")
-   ;; GIF: scp Decapodes.jl/docs/src/grigoriev/grigoriev.gif imgs/grigoriev.gif
    (m-record '(6  6 2024) "LM" "Grigoriev Ice Cap" "https://algebraicjulia.github.io/Decapodes.jl/dev/grigoriev/grigoriev/" "-")
-   ;; GIFs: scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_T.gif imgs/bsh_T.gif
-   ;;        scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_h.gif imgs/bsh_h.gif
    (m-record '(6  6 2024) "GR" "Budyko-Sellers-Halfar" "https://algebraicjulia.github.io/Decapodes.jl/dev/bsh/budyko_sellers_halfar/" "-")
-   ;; GIF: scp Decapodes.jl/docs/src/halmo/halmo_ice.gif imgs/halmo.gif
+   ;; TODO: Add a GIF with ICs that give more dramatic results.
    (m-record '(6  6 2024) "LM" "Halfar-Navier-Stokes" "https://algebraicjulia.github.io/Decapodes.jl/dev/halmo/halmo/" "-")
-   ;; no GIF in docs (generated at runtime)
+   ;; TODO: Generate Halfar-EBM-Water GIF.
    (m-record '(4  12 2024) "LM" "Halfar-EBM-Water" "https://algebraicjulia.github.io/Decapodes.jl/dev/ebm_melt/ebm_melt/" "-")
    (m-record '(13 1 2025) "GR" "Porous Convection" "https://github.com/AlgebraicJulia/Decapodes.jl/pull/297/" "-")
-   ;; GIF: scp Decapodes.jl/docs/src/fokker_planck/fokker_planck.gif imgs/fokker_planck.gif
    (m-record '(30 1 2025) "LM" "Fokker-Planck" "https://algebraicjulia.github.io/Decapodes.jl/dev/fokker_planck/fokker_planck/" "-")
-   ;; video (mhd.mp4) rather than GIF in docs
    (m-record '(30 1 2025) "LM & MC" "Magnetohydrodynamics" "https://algebraicjulia.github.io/Decapodes.jl/dev/examples/mhd/" "-")
-   ;; no GIF in docs
    (m-record '(30 1 2025) "MC" "Tumor Proliferation-Invasion" "https://algebraicjulia.github.io/Decapodes.jl/dev/examples/oncology/tumor_proliferation_invasion/" "-")
-   ;; no GIF in docs
    (m-record '(6  3 2025) "LM" "Navier-Stokes, Cahn-Hilliard" "https://github.com/AlgebraicJulia/Decapodes.jl/blob/main/examples/climate/mpf.jl" "-")))
 
 (define plots
   (vector
-   (m-picture "Co-rotating vortices on a sphere" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
+   (m-picture "Navier-Stokes co-rotating point vortices" "imgs/vort.gif" "A gif of 6 co-rotating point vortices according to the Navier-Stokes equations")
    (m-picture "Brusselator reaction on a teapot" "imgs/brusselator_teapot.gif" "A gif of the Brusselator autocatalytic reaction on the classic teapot mesh")
    (m-picture "Brusselator reaction on a square" "imgs/brusselator_square.gif" "A gif of the Brusselator autocatalytic reaction on the unit square")
    (m-picture "Brusselator reaction on a sphere" "imgs/brusselator_sphere.gif" "A gif of the Brusselator autocatalytic reaction on the unit sphere")
@@ -78,22 +71,22 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-picture "Burgers' equation" "imgs/burger_low_dif.gif" "A gif of Burger's Equation on a line")
    (m-picture "Gray-Scott reaction on a square" "imgs/gray_scott_square.gif" "A gif of the Gray-Scott reaction on the unit square")
    (m-picture "\"Halfar's dome\"" "imgs/ice_dynamics_cism.gif" "A gif of Halfar's equation on a plane")
-   (m-picture "Halfar's equation on PIOMAS data" "imgs/piomas_after.png" "PIOMAS ice thickness diffused on a globe")
-   (m-picture "Fluid Energetic Electron Dissipation" "imgs/kim.gif" "A gif of electron flux")
+   (m-picture "Halfar-EBM-Water on PIOMAS data" "imgs/piomas_after.png" "PIOMAS ice thickness diffused on a globe")
+   (m-picture "Fluid Energetic Electron Dissipation" "imgs/energy_by_time.gif" "A gif of electron flux")
    (m-picture "\"Veronis\" lightning model" "imgs/veronis.gif" "A gif of a lightning strike")
    (m-picture "Klausmeier's vegetation model" "imgs/klausmeier.gif" "A gif of traveling vegetation waves")
+   ;; TODO: Generate Tumor Proliferation-Invasion GIF.
    (m-picture "Gompertz growth oncology model" "imgs/gompertz.png" "Tumor proliferation")
    (m-picture "Porous media flow" "imgs/porous.gif" "A gif of flow in porous media")
-   ;; scp Decapodes.jl/docs/src/grigoriev/grigoriev.gif imgs/grigoriev.gif
    (m-picture "Grigoriev ice cap" "imgs/grigoriev.gif" "A gif of Halfar ice flow on the Grigoriev ice cap, Kyrgyzstan")
-   ;; scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_T.gif imgs/bsh_T.gif
    (m-picture "Budyko-Sellers-Halfar surface temperature" "imgs/bsh_T.gif" "A gif of surface temperature in the Budyko-Sellers-Halfar model")
-   ;; scp Decapodes.jl/docs/src/bsh/budyko_sellers_halfar_h.gif imgs/bsh_h.gif
    (m-picture "Budyko-Sellers-Halfar ice height" "imgs/bsh_h.gif" "A gif of ice height in the Budyko-Sellers-Halfar model")
-   ;; scp Decapodes.jl/docs/src/halmo/halmo_ice.gif imgs/halmo.gif
-   (m-picture "Halfar-Navier-Stokes ice thickness" "imgs/halmo.gif" "A gif of ice thickness in the HALMO coupled ice and water model")
-   ;; scp Decapodes.jl/docs/src/fokker_planck/fokker_planck.gif imgs/fokker_planck.gif
-   (m-picture "Fokker-Planck probability density on a sphere" "imgs/fokker_planck.gif" "A gif of a probability density function evolving on an icosphere")))
+   (m-picture "Halfar-Navier-Stokes ice thickness" "imgs/halmo.gif" "A gif of ice thickness in the coupled ice and water model")
+   (m-picture "Navier-Stokes, Cahn-Hilliard" "imgs/mpf.gif" "A gif of multi-phase flow")
+   (m-picture "Fokker-Planck probability density on a sphere" "imgs/fokker_planck.gif" "A gif of a probability density function evolving on an icosphere")
+   (m-picture "Navier-Stokes, Cahn-Hilliard" "imgs/phasefield.gif" "A gif of multi-phase flow")
+   (m-picture "Navier-Stokes Taylor Vortices" "imgs/taylor_vort.gif" "A gif of repelling Taylor Vortices on a sphere")
+   (m-picture "Curl of E field" "imgs/mhd.gif" "A gif of magnetohydrodynamics")))
 
 (define diagrams
   (vector
@@ -108,25 +101,39 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    (m-string-diagram "Klausmeier vegetation model" "imgs/klausmeier.svg")
    (m-string-diagram "Gompertz tumor proliferation-invasion model" "imgs/oncology.svg")
    (m-string-diagram "Porous convection" "imgs/porous.svg")
-   (m-string-diagram "Veronis, Inan, Pasko, Bell lightning model" "imgs/veronis.svg")))
+   (m-string-diagram "Veronis, Inan, Pasko, Bell lightning model" "imgs/veronis.svg")
+   (m-string-diagram "Budyko-Sellers-Halfar" "imgs/bsh.svg")
+   (m-string-diagram "Navier-Stokes-Cahn-Hilliard" "imgs/vort_ch.svg")
+   (m-string-diagram "Budyko-Sellers-Halfar" "imgs/bsh.svg")
+   (m-string-diagram "Fokker-Planck" "imgs/fp.svg")
+   (m-string-diagram "Halfar-Navier-Stokes" "imgs/halmo.svg")
+   (m-string-diagram "Magnetohydrodynamics" "imgs/mhd.svg")
+   (m-string-diagram "Budyko-Sellers-Halfar-Water" "imgs/bshw_decapode.svg")))
 
 (define scenarios
   (vector
    (m-scenario "Vorticity" 0 0)
+   (m-scenario "Taylor Vorticity" 22 0)
    (m-scenario "Brusselator Teapot" 1 1)
    (m-scenario "Brusselator Square" 2 1)
    (m-scenario "Brusselator Sphere" 3 1)
    (m-scenario "Halfar Dome" 8 6)
-   (m-scenario "Halfar PIOMAS" 9 6)
+   (m-scenario "Halfar-EBM-Water PIOMAS" 9 18)
+   (m-scenario "Halfar Grigoriev" 15 6)
    (m-scenario "Gray-Scott Sphere" 7 2)
+   (m-scenario "Navier-Stokes-Cahn-Hilliard" 19 13)
+   (m-scenario "Navier-Stokes-Cahn-Hilliard" 21 13)
    (m-scenario "FEED" 10 7)
    (m-scenario "Veronis" 11 11)
    (m-scenario "Klausmeier" 12 8)
+   (m-scenario "Magnetohydrodynamics" 23 17)
    (m-scenario "Budyko-Sellers" 5 4)
+   (m-scenario "Budyko-Sellers-Halfar" 17 14)
    (m-scenario "Cahn-Hilliard" 4 5)
+   (m-scenario "Fokker-Planck" 20 15)
    (m-scenario "Oncology" 13 9)
    (m-scenario "Porous" 14 10)
-   (m-scenario "Burgers" 6 3)))
+   (m-scenario "Halfar-Navier-Stokes" 18 16)))
 
 #| Time Helper Functions |#
 (define months (vector "January" "February" "March" "April" "May" "June"
@@ -237,7 +244,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   (when show-leaderboard
     (div style:"margin-top: 5em;"
          (h5 "It has been " (strong days-since-record) " days since a new Decapodes world record.")
-         (h5 "It has been " (strong days-since-entry) " days since a new Decapodes entry."))))
+         (h5 "It has been " (strong days-since-entry) " days since a new Decapodes record entry."))))
 
 #| Records Table i.e. The Leader Board |#
 (define (leader-board)
@@ -371,7 +378,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
    floating-header
    (div class:"main-content"
         instructions
-        records-announcement
+        ;;records-announcement
         leader-board
         scenario-showcase
         decapodes-overview)
