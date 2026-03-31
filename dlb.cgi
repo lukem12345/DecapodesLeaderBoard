@@ -15,10 +15,6 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
   scribble/html
   syntax/to-string)
 
-;; Boilerplate for evals.
-(define-namespace-anchor ns-a)
-(define ns (namespace-anchor->namespace ns-a))
-
 #| Database of records, plots, and diagrams |#
 (struct record   (day-code initials multiphysics link dev-time fnote))
 (struct picture  (title src alt width))
@@ -168,6 +164,10 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
      (check-option show-plots-check)
      (check-option show-diagrams-check))))
 
+(define show-vars (hash "leaderboard" show-leaderboard
+                        "plots"       show-plots
+                        "diagrams"    show-diagrams))
+
 ;; A boolean HTML attribute is (conventionally) only allowed to be set to the name of that attribute.
 ;; Otherwise, it should not be present.
 (define (bool-attribute bool attr)
@@ -179,7 +179,7 @@ This CGI is meant to keep track of multiphysics simulations in a leader-board fo
 (define (hiding-checkbox to-show)
   (define id (~a "show-" to-show))
   (define label-val (string-titlecase to-show))
-  (define checked (checked-attr (eval (string->symbol id) ns)))
+  (define checked (checked-attr (hash-ref show-vars to-show #f)))
   (div class:"hiding-checkbox"
        (label for: id label-val)
        (apply element 'input 'type: "checkbox" 'id: id 'name: id 'value: "T" checked)))
